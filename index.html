@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Loop Example</title>
+  <title>Al-Quran | Halaman</title>
 
   <!-- Add Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -29,7 +29,8 @@
 
 <script>
   // Base URL for the images
-  const baseUrl = 'https://media.qurankemenag.net/khat2/QK_';
+  // const baseUrl = 'https://media.qurankemenag.net/khat2/QK_';
+  const baseUrl = 'images/QK_';
 
   // Number of images
   const numImages = 604;
@@ -44,7 +45,7 @@
 
     // Create img element with Bootstrap's img-fluid class
     const imgElement = document.createElement('img');
-    imgElement.classList.add('col-md-6');
+    imgElement.classList.add('col-md-5');
 
     // Set image source
     imgElement.src = imageUrl;
