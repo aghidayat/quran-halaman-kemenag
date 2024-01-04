@@ -6,8 +6,20 @@
   <title>Image Loop Example</title>
 
   <!-- Add Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+  <style>
+    /* Custom CSS for horizontal scrolling from left to right */
+    #imageContainer {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      max-height: 100vh;
+      direction: ltr;
+    }
+  </style>
 </head>
+
 <body>
 
 <!-- Container for displaying images with Bootstrap grid -->
@@ -25,18 +37,14 @@
   // Get the container element
   const imageContainer = document.getElementById('imageContainer');
 
-  // Loop through image numbers and create img elements
+  // Loop through image numbers and create img elements in reverse order
   for (let i = 1; i <= numImages; i++) {
     // Generate image URL
     const imageUrl = `${baseUrl}${String(i).padStart(3, '0')}.webp`;
 
-    // Create Bootstrap column div
-    const colDiv = document.createElement('div');
-    colDiv.classList.add('col-md-6'); // Set column width for medium-sized screens
-
     // Create img element with Bootstrap's img-fluid class
     const imgElement = document.createElement('img');
-    imgElement.classList.add('img-fluid');
+    imgElement.classList.add('col-md-6');
 
     // Set image source
     imgElement.src = imageUrl;
@@ -44,18 +52,12 @@
     // Set alt text (replace with relevant description)
     imgElement.alt = `Image ${i}`;
 
-    // Append img element to column div
-    colDiv.appendChild(imgElement);
-
     // Append column div to the container
-    imageContainer.appendChild(colDiv);
+    imageContainer.appendChild(imgElement);
   }
 </script>
 
-<!-- Add Bootstrap JS and Popper.js -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
 </body>
 </html>
