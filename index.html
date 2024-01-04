@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Loop Example</title>
+
+  <!-- Add Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<!-- Container for displaying images with Bootstrap grid -->
+<div class="container">
+  <div class="row flex-row-reverse" id="imageContainer"></div>
+</div>
+
+<script>
+  // Base URL for the images
+  const baseUrl = 'https://media.qurankemenag.net/khat2/QK_';
+
+  // Number of images
+  const numImages = 604;
+
+  // Get the container element
+  const imageContainer = document.getElementById('imageContainer');
+
+  // Loop through image numbers and create img elements
+  for (let i = 1; i <= numImages; i++) {
+    // Generate image URL
+    const imageUrl = `${baseUrl}${String(i).padStart(3, '0')}.webp`;
+
+    // Create Bootstrap column div
+    const colDiv = document.createElement('div');
+    colDiv.classList.add('col-md-6'); // Set column width for medium-sized screens
+
+    // Create img element with Bootstrap's img-fluid class
+    const imgElement = document.createElement('img');
+    imgElement.classList.add('img-fluid');
+
+    // Set image source
+    imgElement.src = imageUrl;
+
+    // Set alt text (replace with relevant description)
+    imgElement.alt = `Image ${i}`;
+
+    // Append img element to column div
+    colDiv.appendChild(imgElement);
+
+    // Append column div to the container
+    imageContainer.appendChild(colDiv);
+  }
+</script>
+
+<!-- Add Bootstrap JS and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
