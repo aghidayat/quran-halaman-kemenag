@@ -25,11 +25,131 @@
 <!-- Container for displaying images with Bootstrap grid -->
 <div class="container">
   <div class="row flex-row-reverse" id="imageContainer"></div>
+  <div class="mt-3">
+    <label for="pageNumber">Go to Page:</label>
+    <input type="number" id="pageNumber" class="form-control" min="1" max="604" placeholder="Enter page number">
+    <select name="surahs" id="surahs" onchange="selectSurah(this.value)" class="form-control">
+      <option value="1">1. Al-Fatiha (الفاتحة) - Pembukaan</option>
+      <option value="2">2. Al-Baqarah (البقرة) - Sapi Betina</option>
+      <option value="50">3. Aali Imran (آل عمران) - Keluarga Imran</option>
+      <option value="77">4. An-Nisa' (النساء) - Wanita</option>
+      <option value="106">5. Al-Ma'idah (المائدة) - Jamuan Makan</option>
+      <option value="128">6. Al-An'am (الأنعام) - Binatang Ternak</option>
+      <option value="151">7. Al-A'raf (الأعراف) - Tempat Tengah</option>
+      <option value="177">8. Al-Anfal (الأنفال) - Harta Rampasan Perang</option>
+      <option value="187">9. At-Tawbah (التوبة) - Taubat</option>
+      <option value="208">10. Yunus (يونس) - Nabi Yunus</option>
+      <option value="221">11. Hud (هود) - Nabi Hud</option>
+      <option value="235">12. Yusuf (يوسف) - Nabi Yusuf</option>
+      <option value="249">13. Ar-Ra'd (الرعد) - Petir</option>
+      <option value="255">14. Ibrahim (إبراهيم) - Nabi Ibrahim</option>
+      <option value="262">15. Al-Hijr (الحجر) - Batu yang Kokoh</option>
+      <option value="267">16. An-Nahl (النحل) - Lebah</option>
+      <option value="282">17. Al-Isra (الإسراء) - Perjalanan Malam</option>
+      <option value="293">18. Al-Kahf (الكهف) - Gua</option>
+      <option value="305">19. Maryam (مريم) - Maryam</option>
+      <option value="312">20. Ta-Ha (طه) - "Ta" dan "Ha"</option>
+      <option value="1">Al-Anbiya (الأنبياء) - Nabi-nabi</option>
+      <option value="1">Al-Hajj (الحج) - Haji</option>
+      <option value="1">Al-Mu'minun (المؤمنون) - Orang-orang Mukmin</option>
+      <option value="1">Az-Zumar (الزمر) - Orang-orang yang Berkumpul</option>
+      <option value="1">Fussilat (فصلت) - Dijelaskan dengan Jelas</option>
+      <option value="1">Ghafir (الغافر) - Pengampun</option>
+      <option value="1">Fussilat (فصلت) - Dijelaskan dengan Jelas</option>
+      <option value="1">Ghafir (الغافر) - Pengampun</option>
+      <option value="1">Fussilat (فصلت) - Dijelaskan dengan Jelas</option>
+      <option value="1">Ghafir (الغافر) - Pengampun</option>
+      <option value="1">Fussilat (فصلت) - Dijelaskan dengan Jelas</option>
+      <option value="1">Ghafir (الغافر) - Pengampun</option>
+      <option value="1">Fussilat (فصلت) - Dijelaskan dengan Jelas</option>
+      <option value="1">Ghafir (الغافر) - Pengampun</option>
+      <option value="1">Fussilat (فصلت) - Dijelaskan dengan Jelas</option>
+      <option value="1">Ghafir (الغافر) - Pengampun</option>
+      <option value="1">Fussilat (فصلت) - Dijelaskan dengan Jelas</option>
+      <option value="1">Ghafir (الغافر) - Pengampun</option>
+      <option value="1">Fussilat (فصلت) - Dijelaskan dengan Jelas</option>
+      <option value="1">Ghafir (الغافر) - Pengampun</option>
+      <option value="1">Fussilat (فصلت) - Dijelaskan dengan Jelas</option>
+      <option value="1">Ghafir (الغافر) - Pengampun</option>
+      <option value="1">Fussilat (فصلت) - Dijelaskan dengan Jelas</option>
+      <option value="1">Ghafir (الغافر) - Pengampun</option>
+      <option value="1">Al-Jathiya (الجاثية) - Yang Berlutut</option>
+      <option value="1">Al-Ahqaf (الأحقاف) - Bukit Pasir</option>
+      <option value="1">Muhammad (محمد) - Nabi Muhammad</option>
+      <option value="1">Al-Fath (الفتح) - Kemenangan</option>
+      <option value="1">Al-Hujurat (الحجرات) - Kamar-kamar</option>
+      <option value="1">Qaf (ق) - Huruf "Qaf"</option>
+      <option value="1">Adh-Dhariyat (الذاريات) - Angin yang Mencabut</option>
+      <option value="1">At-Tur (الطور) - Bukit</option>
+      <option value="1">An-Najm (النجم) - Bintang</option>
+      <option value="1">Al-Qamar (القمر) - Bulan</option>
+      <option value="1">Ar-Rahman (الرحمن) - Yang Maha Pemurah</option>
+      <option value="1">Al-Waqi'ah (الواقعة) - Hari Kiamat</option>
+      <option value="1">Al-Hadid (الحديد) - Besi</option>
+      <option value="1">Al-Mujadila (المجادلة) - Wanita yang Mengajukan Gugatan</option>
+      <option value="1">Al-Hashr (الحشر) - Pengusiran</option>
+      <option value="1">Al-Mumtahanah (الممتحنة) - Wanita yang Diuji</option>
+      <option value="1">As-Saff (الصف) - Barisan Perang</option>
+      <option value="1">Al-Jumu'ah (الجمعة) - Hari Jumat</option>
+      <option value="1">Al-Munafiqun (المنافقون) - Orang-orang Munafik</option>
+      <option value="1">At-Taghabun (التغابن) - Hari Dinampakkan Kesalahan-Kesalahan</option>
+      <option value="1">At-Talaq (الطلاق) - Talak</option>
+      <option value="1">At-Tahrim (التحريم) - Mengharamkan</option>
+      <option value="1">Al-Mulk (الملك) - Kerajaan</option>
+      <option value="1">Al-Qalam (القلم) - Pensil</option>
+      <option value="1">Al-Haaqqa (الحاقة) - Hari Kiamat</option>
+      <option value="1">Al-Ma'arij (المعارج) - Tempat-tempat Naik</option>
+      <option value="1">Nuh (نوح) - Nabi Nuh</option>
+      <option value="1">Al-Jinn (الجن) - Jin</option>
+      <option value="1">Al-Muzzammil (المزمل) - Orang yang Berselimut</option>
+      <option value="1">Al-Muddathir (المدثر) - Orang yang Berkemul</option>
+      <option value="1">Al-Qiyamah (القيامة) - Hari Kiamat</option>
+      <option value="1">Al-Insan (الإنسان) - Manusia</option>
+      <option value="1">Al-Mursalat (المرسلات) - Malaikat-malaikat yang Diutus</option>
+      <option value="1">An-Naba' (النبأ) - Berita Besar</option>
+      <option value="1">An-Nazi'at (النازعات) - Malaikat-malaikat yang Mencabut</option>
+      <option value="1">Abasa (عبس) - Bermuka Masam</option>
+      <option value="1">At-Takwir (التكوير) - Menggulung</option>
+      <option value="1">Al-Infitar (الإنفطار) - Terbelah</option>
+      <option value="1">Al-Mutaffifin (المطففين) - Orang-orang yang Curang</option>
+      <option value="1">Al-Inshiqaq (الإنشقاق) - Terbelah</option>
+      <option value="1">Al-Buruj (البروج) - Gugusan Bintang</option>
+      <option value="1">At-Tariq (الطارق) - Pemegang Pagi</option>
+      <option value="1">Al-Ala (الأعلى) - Yang Paling Tinggi</option>
+      <option value="1">Al-Ghashiyah (الغاشية) - Hari Pembalasan</option>
+      <option value="1">Al-Fajr (الفجر) - Fajar</option>
+      <option value="1">Al-Balad (البلد) - Kota</option>
+      <option value="1">Ash-Shams (الشمس) - Matahari</option>
+      <option value="1">Al-Lail (الليل) - Malam</option>
+      <option value="1">Adh-Dhuha (الضحى) - Pagi</option>
+      <option value="1">Ash-Sharh (الشرح) - Melapangkan</option>
+      <option value="1">At-Tin (التين) - Buah Tin</option>
+      <option value="1">Al-Alaq (العلق) - Segumpal Darah</option>
+      <option value="1">Al-Qadr (القدر) - Kemuliaan</option>
+      <option value="1">Al-Bayyinah (البينة) - Bukti yang Nyata</option>
+      <option value="1">Az-Zalzalah (الزلزلة) - Guncangan</option>
+      <option value="1">Al-Adiyat (العاديات) - Kuda Perang yang Berlari Kencang</option>
+      <option value="1">Al-Qari'ah (القارعة) - Hari Kiamat</option>
+      <option value="1">At-Takathur (التكاثر) - Bermegah-megahan</option>
+      <option value="1">Al-Asr (العصر) - Masa</option>
+      <option value="1">Al-Humazah (الهمزة) - Pendengki</option>
+      <option value="1">Al-Fil (الفيل) - Gajah</option>
+      <option value="1">Quraish (قريش) - Suku Quraish</option>
+      <option value="1">Al-Ma'un (الماعون) - Barang yang Berguna</option>
+      <option value="1">Al-Kawthar (الكوثر) - Nikmat yang Banyak</option>
+      <option value="1">Al-Kafirun (الكافرون) - Orang-orang Kafir</option>
+      <option value="1">An-Nasr (النصر) - Pertolongan</option>
+      <option value="1">Al-Masad (المسد) - Sabut</option>
+      <option value="1">Al-Ikhlas (الإخلاص) - Kesucian</option>
+      <option value="1">Al-Falaq (الفلق) - Waktu Subuh</option>
+      <option value="1">An-Nas (الناس) - Manusia</option>
+    </select>
+    <button onclick="goToPage()" class="btn btn-primary mt-2">Go</button>
+  </div>
 </div>
 
 <script>
   // Base URL for the images
-  // const baseUrl = 'https://media.qurankemenag.net/khat2/QK_';
   const baseUrl = 'images/QK_';
 
   // Number of images
@@ -53,8 +173,40 @@
     // Set alt text (replace with relevant description)
     imgElement.alt = `Image ${i}`;
 
+    // Set image ID
+    imgElement.id = `page${i}`;
+
     // Append column div to the container
     imageContainer.appendChild(imgElement);
+  }
+
+  // Function to go to a specific page
+  function goToPage() {
+    const pageNumberInput = document.getElementById('pageNumber');
+    const pageNumber = parseInt(pageNumberInput.value);
+
+    if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= numImages) {
+      // Scroll to the image with the specified page number
+      const targetImage = document.getElementById(`page${pageNumber}`);
+      if (targetImage) {
+        targetImage.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      alert('Please enter a valid page number between 1 and 604.');
+    }
+  }
+  function selectSurah(surah) {
+    const pageNumber = parseInt(surah);
+
+    if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= numImages) {
+      // Scroll to the image with the specified page number
+      const targetImage = document.getElementById(`page${pageNumber}`);
+      if (targetImage) {
+        targetImage.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      alert('Please enter a valid page number between 1 and 604.');
+    }
   }
 </script>
 
