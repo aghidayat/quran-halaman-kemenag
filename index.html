@@ -219,8 +219,8 @@
 
 <script>
   // Base URL for the images
-  // const baseUrl = 'images/QK_';
-  const baseUrl = 'https://media.qurankemenag.net/khat2/QK_';
+  const baseUrl = 'images/QK_';
+  // const baseUrl = 'https://media.qurankemenag.net/khat2/QK_';
 
   // Number of images
   const numImages = 604;
@@ -319,6 +319,12 @@
         console.error('Service Worker registration failed:', error);
       });
   }
+</script>
+
+<script>
+  window.addEventListener('offline', () => {
+    alert('You are offline. The app will work in offline mode, but some features may be limited.');
+  });
 </script>
 
 </body>
