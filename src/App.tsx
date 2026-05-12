@@ -3,6 +3,8 @@ import { ChevronLeft, ChevronRight, Bookmark, Search, BookOpen } from 'lucide-re
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+import { version } from '../package.json';
+
 // Utility for tailwind classes
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -424,6 +426,11 @@ const App = () => {
           <div className="absolute inset-0 -z-10" onClick={() => setShowSearch(false)} />
         </div>
       )}
+
+      {/* Footer Version */}
+      <footer className="py-2 text-center">
+        <span className="text-[10px] text-gray-300 font-mono tracking-tighter">v{version}</span>
+      </footer>
 
       {/* CSS for custom scrollbar */}
       <style dangerouslySetInnerHTML={{ __html: `
