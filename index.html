@@ -57,6 +57,27 @@
       max-height: 100vh;
       direction: ltr;
     }
+
+    .modal-custom {
+      position: fixed;
+      top: 20%;
+      left: 10%;
+      width: 80%;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 20px;
+      display: none;
+      z-index: 1000;
+    }
+
+    .modal-backdrop-custom {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 999;
+    }
   </style>
 </head>
 
@@ -195,6 +216,7 @@
   <div class="row flex-row-reverse" id="imageContainer"></div>
 </div>
 
+<!-- Modal -->
 <div class="modal" id="modalSaveLastRead" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -212,6 +234,15 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Modal -->
+<div id="modalBackdrop" class="modal-backdrop-custom"></div>
+<div id="modal" class="modal-custom">
+  <h4 id="modalAyatTitle">Ayat</h4>
+  <p id="modalTerjemahan">Terjemahan akan muncul di sini.</p>
+  <audio id="modalAudio" controls></audio>
+  <button class="btn btn-secondary mt-2" onclick="closeModal()">Tutup</button>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -246,6 +277,9 @@
     // Set image ID
     imgElement.id = `page${i}`;
 
+    // set map
+    imgElement.useMap = `#map-page${i}`;
+
     // Add click event listener to each image
     imgElement.addEventListener('click', function () {
       // Display the modal when an image is clicked
@@ -253,8 +287,68 @@
       $("#lastRead").val(i)
     });
 
-    // Append column div to the container
+    // Dummy data ayat
+    const ayatData = {
+      1: {
+        terjemahan: "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.",
+        audio: "https://cdn.islamic.network/quran/audio/128/ar.alafasy/001.mp3"
+      },
+      2: {
+        terjemahan: "Segala puji bagi Allah, Tuhan seluruh alam.",
+        audio: "https://cdn.islamic.network/quran/audio/128/ar.alafasy/002.mp3"
+      }
+    };
+
+    // Create image
+    imgElement.src = imageUrl;
+    imgElement.alt = "Halaman 1";
+    imgElement.classList.add('img-fluid');
+    imgElement.useMap = "#map-page1";
     imageContainer.appendChild(imgElement);
+
+    // Create image map
+    const mapElement = document.createElement('map');
+    mapElement.name = "map-page1";
+
+    const areas = [
+      { coords: "100,200,500,230", ayat: 1 },
+      { coords: "100,250,500,280", ayat: 2 }
+    ];
+
+    areas.forEach(areaData => {
+      const area = document.createElement('area');
+      area.shape = "rect";
+      area.coords = areaData.coords;
+      area.alt = `Ayat ${areaData.ayat}`;
+      area.dataset.ayat = areaData.ayat;
+      area.href = "#";
+
+      area.addEventListener('click', function (e) {
+        e.preventDefault();
+        const ayat = this.dataset.ayat;
+        const data = ayatData[ayat];
+        if (data) {
+          document.getElementById('modalAyatTitle').textContent = `Ayat ${ayat}`;
+          document.getElementById('modalTerjemahan').textContent = data.terjemahan;
+          document.getElementById('modalAudio').src = data.audio;
+          document.getElementById('modal').style.display = 'block';
+          document.getElementById('modalBackdrop').style.display = 'block';
+        }
+      });
+
+      mapElement.appendChild(area);
+    });
+
+    // Append column div to the container
+    // imageContainer.appendChild(imgElement);
+    document.body.appendChild(mapElement);
+  }
+
+  // Close modal
+  function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+    document.getElementById('modalBackdrop').style.display = 'none';
+    document.getElementById('modalAudio').pause();
   }
 
   // Function to go to a specific page
