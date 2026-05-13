@@ -4,6 +4,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 import { version } from '../package.json';
+import { CHANGELOG } from './data/changelog';
 
 // Utility for tailwind classes
 function cn(...inputs: ClassValue[]) {
@@ -135,6 +136,7 @@ const App = () => {
   // Spread: [Page n+1 (Left), Page n (Right)]
   const [rightPage, setRightPage] = useState(1);
   const [showSearch, setShowSearch] = useState(false);
+  const [showChangelog, setShowChangelog] = useState(false);
   const [lastRead, setLastRead] = useState<number | null>(null);
 
   useEffect(() => {
@@ -427,9 +429,50 @@ const App = () => {
         </div>
       )}
 
+      {/* Changelog Modal */}
+      {showChangelog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowChangelog(false)}>
+          <div 
+            className="bg-white w-full max-w-md rounded-3xl shadow-2xl flex flex-col max-h-[70vh] overflow-hidden animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-800">Riwayat Perubahan</h2>
+              <button onClick={() => setShowChangelog(false)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+              <div className="space-y-8">
+                {CHANGELOG.map((entry, i) => (
+                  <div key={entry.version} className="relative pl-6 border-l-2 border-amber-100 last:border-0 pb-2">
+                    <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-amber-500 border-4 border-white shadow-sm" />
+                    <div className="flex items-baseline justify-between mb-2">
+                      <span className="font-bold text-amber-700">v{entry.version}</span>
+                      <span className="text-[10px] text-gray-400 font-medium">{entry.date}</span>
+                    </div>
+                    <ul className="space-y-2">
+                      {entry.changes.map((change, j) => (
+                        <li key={j} className="text-sm text-gray-600 flex gap-2">
+                          <span className="text-amber-400 mt-1">•</span>
+                          {change}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Footer Version */}
       <footer className="py-2 text-center">
-        <span className="text-[10px] text-gray-300 font-mono tracking-tighter">v{version}</span>
+        <button 
+          onClick={() => setShowChangelog(true)}
+          className="text-[10px] text-gray-300 font-mono tracking-tighter hover:text-amber-500 transition-colors"
+        >
+          v{version}
+        </button>
       </footer>
 
       {/* CSS for custom scrollbar */}
