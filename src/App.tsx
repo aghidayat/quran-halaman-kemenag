@@ -1,10 +1,19 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Bookmark, Search, BookOpen } from 'lucide-react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Bookmark,
+  Search,
+  BookOpen,
+  Play,
+  Square,
+  Loader2,
+} from "lucide-react";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
-import { version } from '../package.json';
-import { CHANGELOG } from './data/changelog';
+import { version } from "../package.json";
+import { CHANGELOG } from "./data/changelog";
 
 // Utility for tailwind classes
 function cn(...inputs: ClassValue[]) {
@@ -12,7 +21,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 const NUM_IMAGES = 604;
-const BASE_URL = '/images/QK_';
+const BASE_URL = "/images/QK_";
 
 const SURAHS = [
   { id: 1, name: "Al-Fatihah", nameAr: "الفاتحة", page: 1 },
@@ -139,8 +148,19 @@ const App = () => {
   const [showChangelog, setShowChangelog] = useState(false);
   const [lastRead, setLastRead] = useState<number | null>(null);
 
+  // Audio State
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+
+  const getCurrentSurah = useMemo(() => {
+    // Find the surah that corresponds to the rightPage
+    // We look for the surah with the largest page number that is <= rightPage
+    return [...SURAHS].reverse().find(s => s.page <= rightPage) || SURAHS[0];
+  }, [rightPage]);
+
   useEffect(() => {
-    const saved = localStorage.getItem('lastRead');
+    const saved = localStorage.getItem("lastRead");
     if (saved) {
       setLastRead(parseInt(saved));
       const page = parseInt(saved);
@@ -149,14 +169,75 @@ const App = () => {
     }
   }, []);
 
+  // Audio Logic
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
+    setIsPlaying(false);
+    setIsLoading(false);
+  };
+
+  const toggleAudio = async () => {
+    if (isPlaying) {
+      stopAudio();
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const surahId = getCurrentSurah.id;
+      // We use Alafasy recitation from alquran.cloud
+      // The direct audio URL pattern for Alafasy is often consistent
+      // But let's fetch to be sure or use a reliable CDN pattern
+      const audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahId}.mp3`;
+      
+      const newAudio = new Audio(audioUrl);
+      audioRef.current = newAudio;
+
+      newAudio.oncanplaythrough = () => {
+        setIsLoading(false);
+        newAudio.play();
+        setIsPlaying(true);
+      };
+
+      newAudio.onended = () => {
+        stopAudio();
+      };
+
+      newAudio.onerror = () => {
+        console.error("Audio playback error");
+        stopAudio();
+        alert("Gagal memutar audio. Silakan coba lagi.");
+      };
+
+      newAudio.load();
+    } catch (error) {
+      console.error("Error starting audio:", error);
+      stopAudio();
+    }
+  };
+
+  // Stop audio when surah changes
+  /* useEffect(() => {
+    stopAudio();
+  }, [getCurrentSurah.id]); */
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => stopAudio();
+  }, []);
+
   const saveToLastRead = (page: number) => {
-    localStorage.setItem('lastRead', page.toString());
+    localStorage.setItem("lastRead", page.toString());
     setLastRead(page);
   };
 
   const getPageUrl = (n: number) => {
     if (n < 1 || n > NUM_IMAGES) return null;
-    return `${BASE_URL}${String(n).padStart(3, '0')}.webp`;
+    return `${BASE_URL}${String(n).padStart(3, "0")}.webp`;
   };
 
   const nextSpread = () => {
@@ -181,13 +262,14 @@ const App = () => {
     return [rightPage + 1 <= NUM_IMAGES ? rightPage + 1 : null, rightPage];
   }, [rightPage]);
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [inputPage, setInputPage] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [inputPage, setInputPage] = useState("");
 
   const filteredSurahs = useMemo(() => {
-    return SURAHS.filter(s => 
-      s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      s.nameAr.includes(searchQuery)
+    return SURAHS.filter(
+      (s) =>
+        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.nameAr.includes(searchQuery),
     );
   }, [searchQuery]);
 
@@ -196,7 +278,7 @@ const App = () => {
     const p = parseInt(inputPage);
     if (!isNaN(p) && p >= 1 && p <= NUM_IMAGES) {
       goToPage(p);
-      setInputPage('');
+      setInputPage("");
     }
   };
 
@@ -205,18 +287,50 @@ const App = () => {
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-[#e5e1da] px-4 py-2 flex flex-col gap-2">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <div className="bg-amber-600 p-1.5 rounded-lg shadow-sm">
               <BookOpen className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-lg font-bold text-[#2c3e50] hidden sm:block">Al-Quran Digital</h1>
+            <div className="flex flex-col -gap-1">
+              <h1 className="text-sm font-bold text-[#2c3e50] leading-none">
+                {getCurrentSurah.name}
+              </h1>
+              <span className="text-[10px] text-amber-700 font-arabic">
+                {getCurrentSurah.nameAr}
+              </span>
+            </div>
+
+            {/* Audio Button */}
+            <button 
+              onClick={toggleAudio}
+              disabled={isLoading}
+              className={cn(
+                "ml-1 p-2 rounded-full transition-all flex items-center gap-2",
+                isPlaying 
+                  ? "bg-red-50 text-red-600 hover:bg-red-100" 
+                  : "bg-amber-50 text-amber-600 hover:bg-amber-100",
+                isLoading && "animate-pulse"
+              )}
+              title={isPlaying ? "Berhenti Muratal" : "Putar Muratal Surah"}
+            >
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : isPlaying ? (
+                <Square className="w-4 h-4 fill-current" />
+              ) : (
+                <Play className="w-4 h-4 fill-current" />
+              )}
+              <span className="text-xs font-bold uppercase tracking-tight hidden sm:inline">
+                {isPlaying ? "Stop" : "Play"}
+              </span>
+            </button>
           </div>
 
           <div className="flex-1 max-w-md hidden md:flex items-center gap-2 bg-gray-100/50 border border-gray-200 rounded-full px-3 py-1.5 focus-within:ring-2 focus-within:ring-amber-500/20 focus-within:border-amber-500 transition-all">
             <Search className="w-4 h-4 text-gray-400" />
-            <input 
-              type="text" 
-              placeholder="Cari Surah..." 
+            <input
+              type="text"
+              placeholder="Cari Surah..."
               className="bg-transparent border-none outline-none text-sm w-full"
               onClick={() => setShowSearch(true)}
               readOnly
@@ -224,9 +338,12 @@ const App = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <form onSubmit={handlePageSubmit} className="flex items-center gap-1">
-              <input 
-                type="number" 
+            <form
+              onSubmit={handlePageSubmit}
+              className="flex items-center gap-1"
+            >
+              <input
+                type="number"
                 placeholder="Hal"
                 value={inputPage}
                 onChange={(e) => setInputPage(e.target.value)}
@@ -234,14 +351,17 @@ const App = () => {
                 min="1"
                 max={604}
               />
-              <button type="submit" className="p-1.5 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors shadow-sm">
+              <button
+                type="submit"
+                className="p-1.5 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors shadow-sm"
+              >
                 <ChevronRight className="w-4 h-4" />
               </button>
             </form>
-            
+
             <div className="h-6 w-px bg-gray-200 mx-1 hidden sm:block"></div>
 
-            <button 
+            <button
               onClick={() => setShowSearch(true)}
               className="md:hidden p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
@@ -249,12 +369,13 @@ const App = () => {
             </button>
 
             {lastRead && (
-              <button 
+              <button
                 onClick={() => goToPage(lastRead)}
                 className="flex items-center gap-1.5 text-xs font-semibold bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full border border-amber-200 hover:bg-amber-100 transition-colors"
               >
                 <Bookmark className="w-3.5 h-3.5 fill-current" />
-                <span className="hidden xs:inline">Terakhir: </span>{lastRead}
+                <span className="hidden xs:inline">Terakhir: </span>
+                {lastRead}
               </button>
             )}
           </div>
@@ -264,9 +385,8 @@ const App = () => {
       {/* Main Viewport */}
       <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
         <div className="w-full max-w-6xl flex flex-col md:flex-row items-center justify-center gap-4">
-          
           {/* Navigation Buttons (Desktop Side) */}
-          <button 
+          <button
             onClick={nextSpread}
             disabled={rightPage + 1 >= NUM_IMAGES}
             className="hidden md:flex items-center justify-center w-12 h-32 rounded-xl hover:bg-black/5 disabled:opacity-0 transition-all group"
@@ -277,49 +397,62 @@ const App = () => {
 
           {/* Spread Container */}
           <div className="flex flex-row items-start justify-center flex-1 gap-2 md:gap-6">
-            {currentSpread.map((p, idx) => (
+            {currentSpread.map((p, idx) =>
               p ? (
-                <div 
-                  key={p} 
+                <div
+                  key={p}
                   className={cn(
                     "relative flex-1 max-w-[500px] transition-all duration-300",
-                    "group cursor-pointer"
+                    "group cursor-pointer",
                   )}
                   onClick={() => saveToLastRead(p)}
                 >
                   <div className="quran-image bg-white rounded-lg overflow-hidden relative">
-                    <img 
-                      src={getPageUrl(p)!} 
+                    <img
+                      src={getPageUrl(p)!}
                       alt={`Halaman ${p}`}
                       className="w-full h-auto block"
                       loading="lazy"
                     />
                     {/* Page Number Label (Integrated Style) */}
                     <div className="absolute bottom-0 left-0 right-0 py-2 bg-gradient-to-t from-black/5 to-transparent text-center">
-                       <span className="text-[10px] font-bold text-gray-400 tracking-[0.2em]">HALAMAN {p}</span>
+                      <span className="text-[10px] font-bold text-gray-400 tracking-[0.2em]">
+                        HALAMAN {p}
+                      </span>
                     </div>
                   </div>
-                  
+
                   {/* Bookmark Indicator */}
-                  <div className={cn(
-                    "absolute -top-1 right-4 transition-all duration-300",
-                    lastRead === p ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0"
-                  )}>
-                    <div className={cn(
-                      "w-6 h-8 flex items-center justify-center rounded-b-md shadow-sm",
-                      lastRead === p ? "bg-amber-600 text-white" : "bg-gray-200 text-gray-400"
-                    )}>
+                  <div
+                    className={cn(
+                      "absolute -top-1 right-4 transition-all duration-300",
+                      lastRead === p
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0",
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "w-6 h-8 flex items-center justify-center rounded-b-md shadow-sm",
+                        lastRead === p
+                          ? "bg-amber-600 text-white"
+                          : "bg-gray-200 text-gray-400",
+                      )}
+                    >
                       <Bookmark className="w-4 h-4 fill-current" />
                     </div>
                   </div>
                 </div>
               ) : (
-                <div key={`empty-${idx}`} className="flex-1 max-w-[500px] hidden md:block" />
-              )
-            ))}
+                <div
+                  key={`empty-${idx}`}
+                  className="flex-1 max-w-[500px] hidden md:block"
+                />
+              ),
+            )}
           </div>
 
-          <button 
+          <button
             onClick={prevSpread}
             disabled={rightPage === 1}
             className="hidden md:flex items-center justify-center w-12 h-32 rounded-xl hover:bg-black/5 disabled:opacity-0 transition-all group"
@@ -331,7 +464,7 @@ const App = () => {
 
         {/* Mobile Navigation Controls */}
         <div className="mt-8 flex md:hidden items-center gap-12">
-          <button 
+          <button
             onClick={nextSpread}
             disabled={rightPage + 1 >= NUM_IMAGES}
             className="flex flex-col items-center gap-1 group"
@@ -339,10 +472,12 @@ const App = () => {
             <div className="p-4 bg-white border border-gray-200 rounded-2xl shadow-sm active:scale-95 transition-transform">
               <ChevronLeft className="w-6 h-6 text-gray-700" />
             </div>
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Berikutnya</span>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+              Berikutnya
+            </span>
           </button>
-          
-          <button 
+
+          <button
             onClick={prevSpread}
             disabled={rightPage === 1}
             className="flex flex-col items-center gap-1 group"
@@ -350,7 +485,9 @@ const App = () => {
             <div className="p-4 bg-white border border-gray-200 rounded-2xl shadow-sm active:scale-95 transition-transform">
               <ChevronRight className="w-6 h-6 text-gray-700" />
             </div>
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Sebelumnya</span>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+              Sebelumnya
+            </span>
           </button>
         </div>
       </main>
@@ -358,29 +495,32 @@ const App = () => {
       {/* Surah Selector Modal */}
       {showSearch && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div 
+          <div
             className="bg-white w-full max-w-lg rounded-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom-4 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 border-b border-gray-100 flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-800">Cari Surah</h2>
-                <button 
-                  onClick={() => setShowSearch(false)} 
+                <button
+                  onClick={() => setShowSearch(false)}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 >
-                  <Search className="w-5 h-5 rotate-45 text-gray-400" /> {/* Simulating a close icon if needed, but let's just use text/simple cross */}
+                  {/*<Search className="w-5 h-5 rotate-45 text-gray-400" />{" "}*/}
+                  {/* Simulating a close icon if needed, but let's just use text/simple cross */}
                   <span className="sr-only">Tutup</span>
-                  <div className="w-5 h-5 flex items-center justify-center text-xl">×</div>
+                  <div className="w-5 h-5 flex items-center justify-center text-xl">
+                    ×
+                  </div>
                 </button>
               </div>
-              
+
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input 
+                <input
                   autoFocus
-                  type="text" 
-                  placeholder="Ketik nama surah..." 
+                  type="text"
+                  placeholder="Ketik nama surah..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-transparent focus:border-amber-500 focus:bg-white rounded-2xl outline-none transition-all"
@@ -390,12 +530,12 @@ const App = () => {
 
             <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
               <div className="grid grid-cols-1 gap-2">
-                {filteredSurahs.map(s => (
+                {filteredSurahs.map((s) => (
                   <button
                     key={s.id}
                     onClick={() => {
                       goToPage(s.page);
-                      setSearchQuery('');
+                      setSearchQuery("");
                     }}
                     className="flex items-center justify-between p-4 hover:bg-amber-50 rounded-2xl transition-all group text-left border border-transparent hover:border-amber-100"
                   >
@@ -405,7 +545,9 @@ const App = () => {
                       </span>
                       <div>
                         <div className="font-bold text-gray-800">{s.name}</div>
-                        <div className="text-xs text-gray-400 font-medium">Halaman {s.page}</div>
+                        <div className="text-xs text-gray-400 font-medium">
+                          Halaman {s.page}
+                        </div>
                       </div>
                     </div>
                     <div className="font-arabic text-2xl text-amber-800 group-hover:scale-110 transition-transform">
@@ -418,40 +560,65 @@ const App = () => {
                     <div className="text-gray-300 mb-2">
                       <Search className="w-12 h-12 mx-auto opacity-20" />
                     </div>
-                    <p className="text-gray-400 font-medium">Surah tidak ditemukan</p>
+                    <p className="text-gray-400 font-medium">
+                      Surah tidak ditemukan
+                    </p>
                   </div>
                 )}
               </div>
             </div>
           </div>
           {/* Backdrop closer */}
-          <div className="absolute inset-0 -z-10" onClick={() => setShowSearch(false)} />
+          <div
+            className="absolute inset-0 -z-10"
+            onClick={() => setShowSearch(false)}
+          />
         </div>
       )}
 
       {/* Changelog Modal */}
       {showChangelog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowChangelog(false)}>
-          <div 
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setShowChangelog(false)}
+        >
+          <div
             className="bg-white w-full max-w-md rounded-3xl shadow-2xl flex flex-col max-h-[70vh] overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-800">Riwayat Perubahan</h2>
-              <button onClick={() => setShowChangelog(false)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+              <h2 className="text-xl font-bold text-gray-800">
+                Riwayat Perubahan
+              </h2>
+              <button
+                onClick={() => setShowChangelog(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+              >
+                ×
+              </button>
             </div>
             <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
               <div className="space-y-8">
                 {CHANGELOG.map((entry, i) => (
-                  <div key={entry.version} className="relative pl-6 border-l-2 border-amber-100 last:border-0 pb-2">
+                  <div
+                    key={entry.version}
+                    className="relative pl-6 border-l-2 border-amber-100 last:border-0 pb-2"
+                  >
                     <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-amber-500 border-4 border-white shadow-sm" />
                     <div className="flex items-baseline justify-between mb-2">
-                      <span className="font-bold text-amber-700">v{entry.version}</span>
-                      <span className="text-[10px] text-gray-400 font-medium">{entry.date}</span>
+                      <span className="font-bold text-amber-700">
+                        v{entry.version}
+                      </span>
+                      <span className="text-[10px] text-gray-400 font-medium">
+                        {entry.date}
+                      </span>
                     </div>
                     <ul className="space-y-2">
                       {entry.changes.map((change, j) => (
-                        <li key={j} className="text-sm text-gray-600 flex gap-2">
+                        <li
+                          key={j}
+                          className="text-sm text-gray-600 flex gap-2"
+                        >
                           <span className="text-amber-400 mt-1">•</span>
                           {change}
                         </li>
@@ -467,7 +634,7 @@ const App = () => {
 
       {/* Footer Version */}
       <footer className="py-2 text-center">
-        <button 
+        <button
           onClick={() => setShowChangelog(true)}
           className="text-[10px] text-gray-300 font-mono tracking-tighter hover:text-amber-500 transition-colors"
         >
@@ -476,7 +643,9 @@ const App = () => {
       </footer>
 
       {/* CSS for custom scrollbar */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
@@ -490,7 +659,9 @@ const App = () => {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #d1cdc4;
         }
-      `}} />
+      `,
+        }}
+      />
     </div>
   );
 };
